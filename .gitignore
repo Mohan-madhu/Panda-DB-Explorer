@@ -1,2 +1,31 @@
-/node_modules
-/package-lock.json
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+
+# Lock files
+package-lock.json
+client/package-lock.json
+server/package-lock.json
+
+# Runtime data (auto-created on first run)
+server/data/connections.json
+server/data/history.json
+server/data/snippets.json
+server/data/queries/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp
