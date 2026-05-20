@@ -82,4 +82,20 @@ router.post('/execute-multi', async (req, res) => {
         columnSets: (result.recordsets || [result.recordset]).map(rs =>
           rs?.columns ? Object.keys(rs.columns) : []
         ),
-        messa
+        messages: msgs,
+        rowsAffected: result.rowsAffected,
+        elapsed, success: true,
+      };
+      cache.addHistory({ connectionId: connId, database, sql: sqlText, elapsed, rowCount: results[connId].recordsets[0]?.length || 0, success: true, timestamp: new Date().toISOString() });
+    } catch (err) {
+      results[connId] = { error: err.message, elapsed: Date.now() - startTime, success: false };
+    }
+  }));
+
+  res.json(results);
+});
+
+router.get('/history', (req, res) => res.json(cache.getHistory()));
+router.delete('/history', (req, res) => { cache.clearHistory(); res.json({ success: true }); });
+
+module.exports = router;
