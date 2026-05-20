@@ -1,0 +1,277 @@
+[
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_login    order by rcm desc\r\nselect * from tbl_user order by rcm desc\r\nselect * from tbl_dk_kitchens order by rcm desc",
+    "elapsed": 1271,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T22:04:03.699Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": null,
+    "sql": "select * from tbl_login    order by rcm desc",
+    "elapsed": 696,
+    "rowCount": 0,
+    "success": false,
+    "error": "Invalid object name 'tbl_login'.",
+    "timestamp": "2026-05-20T22:03:58.599Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": null,
+    "sql": "select * from tbl_login     order by rcm desc",
+    "elapsed": 689,
+    "rowCount": 0,
+    "success": false,
+    "error": "Invalid object name 'tbl_login'.",
+    "timestamp": "2026-05-20T22:03:44.137Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": null,
+    "sql": "select * from tbl_login     order by rcm desc\r\nselect * from tbl_user order by rcm desc\r\nselect * from tbl_dk_kitchens order by rcm desc",
+    "elapsed": 716,
+    "rowCount": 0,
+    "success": false,
+    "error": "Invalid object name 'tbl_login'.",
+    "timestamp": "2026-05-20T22:03:39.045Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": null,
+    "sql": "select * from tbl_login     order by rcm desc\r\nselect * from tbl_user order by rcm desc\r\nselect * from tbl_dk_kitchens order by rcm desc",
+    "elapsed": 691,
+    "rowCount": 0,
+    "success": false,
+    "error": "Invalid object name 'tbl_login'.",
+    "timestamp": "2026-05-20T22:03:35.126Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket\r\n\r\nSELECT * from tbl_user",
+    "elapsed": 922,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:54.962Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket\r\n\r\nSELECT * from tbl_user",
+    "elapsed": 750,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:52.644Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket\r\n\r\nSELECT * from tbl_user",
+    "elapsed": 707,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:51.630Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket\r\n\r\nSELECT * from tbl_user",
+    "elapsed": 754,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:50.742Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket\r\n\r\nSELECT * from tbl_user",
+    "elapsed": 723,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:35.911Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "use db_dearbasket",
+    "elapsed": 2776,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:54:14.399Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_user",
+    "elapsed": 940,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:51:13.766Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_user",
+    "elapsed": 728,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:51:12.165Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_user",
+    "elapsed": 769,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:51:08.777Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_user",
+    "elapsed": 870,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:51:07.314Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select * from tbl_user",
+    "elapsed": 1760,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:51:04.555Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_user]",
+    "elapsed": 2952,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:44:03.983Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_user]",
+    "elapsed": 747,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:42:06.650Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 798,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:57.359Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 1615,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:54.308Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 898,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:52.408Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 871,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:51.492Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 751,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:50.318Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 729,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:49.260Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 1067,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:48.179Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "SELECT * from [dbo].[tbl_dk_kitchens]",
+    "elapsed": 4372,
+    "rowCount": 0,
+    "success": true,
+    "timestamp": "2026-05-20T21:41:44.841Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select  * from tbl_user",
+    "elapsed": 756,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:19:08.105Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select  * from tbl_user",
+    "elapsed": 1142,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:19:07.016Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select  * from tbl_user",
+    "elapsed": 678,
+    "rowCount": 22,
+    "success": true,
+    "timestamp": "2026-05-20T21:19:05.438Z"
+  },
+  {
+    "connectionId": "d3231f8f-ea80-46f9-8625-508706fd585a",
+    "database": "db_dearbasket",
+    "sql": "select  * fro tbl_user",
+    "elapsed": 4246,
+    "rowCount": 0,
+    "success": false,
+    "error": "Incorrect syntax near 'fro'.",
+    "timestamp": "2026-05-20T21:19:03.379Z"
+  }
+]

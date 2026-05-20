@@ -1,0 +1,23 @@
+.params-modal { max-width: 480px; width: 90vw; }
+
+.params-body {
+  padding: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.params-empty { font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0; }
+
+.params-row { margin: 0; }
+.params-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.params-name { font-size: 13px; font-weight: 500; color: var(--text-primary); font-family: Consolas, monospace; }
+.params-type { font-size: 11px; color: var(--accent); background: var(--bg-tertiary); padding: 1px 6px; border-radius: 4px; }
+.params-output { background: var(--bg-tertiary) !important; color: var(--text-muted) !important; cursor: not-allowed; }

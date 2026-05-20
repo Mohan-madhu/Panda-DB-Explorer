@@ -1,0 +1,35 @@
+.diff-view { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.diff-summary {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.diff-badge {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+}
+.diff-badge.same { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+.diff-badge.changed { background: rgba(255, 152, 0, 0.15); color: #ff9800; }
+.diff-badge.left-only { background: rgba(33, 150, 243, 0.15); color: #2196f3; }
+.diff-badge.right-only { background: rgba(156, 39, 176, 0.15); color: #9c27b0; }
+
+.diff-panels { display: flex; flex: 1; min-height: 0; }
+.diff-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.diff-divider { width: 3px; background: var(--border); flex-shrink: 0; }
+
+.diff-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.diff-panel-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.diff-panel-meta { font-size: 11px; color: var(--text-muted); }
+
+.diff-panel-grid-wrap { flex: 1; overflow: auto; min-height: 0; }
+.diff-grid { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 11px; font-family: Consolas, monospace; }
+.diff-grid th { background: var(--bg-tertiary); border: 1px solid var(--border); padding: 3px 8px; font-size: 10px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+.diff-grid td { border: 1px solid var(--border); padding: 2px 8px; white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+.diff-row-num { color: var(--text-muted); font-size: 10px; text-align: right; background: var(--bg-tertiary) !important; min-width: 32px; border-right: 2px solid var(--border) !important; }
+
+.diff-row-changed td { background: rgba(255, 152, 0, 0.06) !important; }
+.diff-row-missing td { background: rgba(33, 150, 243, 0.06) !important; opacity: 0.5; }
+.diff-row-placeholder td { background: rgba(0,0,0,0.03) !important; }
+.diff-cell-changed { background: rgba(255, 152, 0, 0.22) !important; font-weight: 600; }

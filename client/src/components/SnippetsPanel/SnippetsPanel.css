@@ -1,0 +1,63 @@
+.snippets-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  min-width: 240px;
+}
+
+.snippets-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-tertiary);
+}
+.snippets-title { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.snippets-search { padding: 6px 8px; }
+.snippets-search input { width: 100%; box-sizing: border-box; }
+
+.snippet-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+.snippet-edit-name, .snippet-edit-tags { font-size: 12px; }
+.snippet-edit-sql {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 80px;
+}
+.snippet-edit-actions { display: flex; justify-content: flex-end; gap: 6px; }
+
+.snippets-list { flex: 1; overflow-y: auto; }
+.snippets-empty { padding: 16px 12px; font-size: 12px; color: var(--text-muted); text-align: center; }
+
+.snippet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.snippet-item:hover { background: var(--bg-hover); }
+.snippet-item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.snippet-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.snippet-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.snippet-tag {
+  font-size: 10px; padding: 1px 5px;
+  background: var(--accent); color: #fff; border-radius: 8px;
+}
+.snippet-preview { font-size: 10px; color: var(--text-muted); font-family: Consolas, monospace; }
+
+.snippet-item-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.1s; }
+.snippet-item:hover .snippet-item-actions { opacity: 1; }
+.btn-icon.danger { color: var(--danger, #e05252); }

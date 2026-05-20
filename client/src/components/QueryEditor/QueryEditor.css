@@ -1,0 +1,89 @@
+.query-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Toolbar */
+.qe-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.qe-toolbar::-webkit-scrollbar { display: none; }
+
+.qe-execute { padding: 4px 10px; }
+.qe-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 2px; }
+.qe-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+.qe-elapsed { font-size: 11px; color: var(--text-muted); white-space: nowrap; padding: 0 4px; }
+
+/* Connection multi-select */
+.qe-conn-wrap { display: flex; align-items: center; gap: 4px; }
+.qe-multi {
+  display: flex; gap: 4px; align-items: center;
+  padding: 2px 6px;
+  background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 3px;
+  max-width: 260px; overflow-x: auto; scrollbar-width: none;
+}
+.qe-multi::-webkit-scrollbar { display: none; }
+.qe-multi-item { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+.qe-multi-item input { width: auto; }
+.qe-multi-item:hover { color: var(--text-primary); }
+
+/* Editor + Results split */
+.qe-split {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.qe-editor-area {
+  flex-shrink: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.qe-results-area {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.qe-loading {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; color: var(--text-muted);
+}
+
+.wrap-active {
+  color: var(--accent) !important;
+  background: var(--accent-light) !important;
+}
+
+/* Transaction toolbar */
+.qe-txn { font-size: 11px; padding: 3px 8px; color: var(--text-secondary); }
+.qe-txn-badge {
+  font-size: 11px; padding: 3px 8px; border-radius: 3px;
+  background: rgba(255, 152, 0, 0.18); color: #ff9800; font-weight: 600;
+  white-space: nowrap; animation: txn-pulse 2s infinite;
+}
+.qe-txn-commit { font-size: 11px; padding: 3px 8px; color: #4caf50 !important; }
+.qe-txn-rollback { font-size: 11px; padding: 3px 8px; color: #e05252 !important; }
+
+.in-transaction { border-top: 2px solid #ff9800; }
+
+@keyframes txn-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}

@@ -1,0 +1,106 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 10px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+.topbar-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.topbar-connections {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+}
+.topbar-connections::-webkit-scrollbar { display: none; }
+
+.topbar-spacer { flex: 0 0 8px; }
+
+.topbar-add-conn {
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 3px 8px;
+}
+
+.topbar-explorer-btn {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+.topbar-explorer-btn:hover { color: var(--text-primary); }
+
+.theme-btn { flex-shrink: 0; color: var(--text-secondary); }
+.theme-btn:hover { color: var(--text-primary); }
+[data-theme="light"] .theme-btn { color: var(--warning); }
+[data-theme="light"] .theme-btn:hover { color: #e0a000; }
+
+/* Connection pills */
+.conn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+}
+
+.pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pill-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+
+.pill-connected { background: var(--success-bg); border-color: rgba(78,201,176,0.3); color: var(--success); }
+.pill-connected .pill-dot { background: var(--success); }
+.pill-connected:hover { background: rgba(78,201,176,0.25); }
+
+.pill-disconnected { background: rgba(100,100,100,0.12); border-color: var(--border); color: var(--text-secondary); }
+.pill-disconnected .pill-dot { background: var(--text-muted); }
+.pill-disconnected:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.pill-connecting { background: rgba(0,120,212,0.12); border-color: rgba(0,120,212,0.3); color: var(--accent); }
+.pill-connecting .pill-dot { background: var(--accent); }
+
+.pill-error { background: var(--error-bg); border-color: rgba(244,71,71,0.3); color: var(--error); }
+.pill-error .pill-dot { background: var(--error); }
+.pill-error:hover { background: rgba(244,71,71,0.2); }
+
+.pill-group {
+  font-size: 9px; font-weight: 700; padding: 1px 5px;
+  border-radius: 8px; color: #fff; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.shortcuts-btn { flex-shrink: 0; color: var(--text-secondary); font-size: 14px; }
+.shortcuts-btn:hover { color: var(--text-primary); }
+
+.active-icon { color: var(--accent) !important; }
