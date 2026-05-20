@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; /* mobile: accounts for browser chrome */
   width: 100vw;
   overflow: hidden;
   background: var(--bg-primary);
@@ -11,4 +12,21 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+}
+
+/* Mobile drawer backdrop */
+.drawer-backdrop {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 199;
+    animation: fadeIn 0.15s ease;
+  }
 }

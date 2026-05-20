@@ -87,3 +87,77 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
 }
+
+/* Mobile pane toggle bar — hidden on desktop */
+.qe-mobile-tabs {
+  display: none;
+}
+
+/* ── Tablet ── */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .qe-label-desktop { display: none; }
+  .qe-execute-label { display: none; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  .qe-mobile-tabs {
+    display: flex;
+    flex-shrink: 0;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border);
+  }
+  .qe-mobile-tab {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .qe-mobile-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  [data-mobile-hidden="true"] {
+    display: none !important;
+  }
+
+  /* Toolbar: hide secondary actions, keep only execute + connection */
+  .qe-secondary-actions { display: none; }
+  .qe-label-desktop { display: none; }
+  .qe-execute-label { display: none; }
+
+  /* Editor area fills full height when shown */
+  .qe-editor-area {
+    flex: 1;
+    min-height: 0;
+  }
+  .qe-results-area {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Split becomes column, but panes controlled by data-mobile-hidden */
+  .qe-split {
+    flex-direction: column;
+  }
+
+  /* Hide desktop vertical resizer */
+  .qe-desktop-resizer { display: none; }
+
+  /* Toolbar: wrap to two rows on very small screens */
+  .qe-toolbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 40px;
+    padding: 4px 6px;
+    gap: 4px;
+  }
+}

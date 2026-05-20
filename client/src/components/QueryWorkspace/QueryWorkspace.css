@@ -90,3 +90,24 @@
 }
 .workspace-empty-icon { font-size: 48px; opacity: 0.4; }
 .workspace-empty p { font-size: 14px; }
+
+/* ── Tablet ── */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .tab { min-width: 80px; max-width: 130px; font-size: 11px; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  .tab-bar {
+    height: 40px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    min-width: 90px;
+    max-width: 140px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+  .tab-close { opacity: 1; }
+  .tab-new { width: 40px; font-size: 20px; }
+}

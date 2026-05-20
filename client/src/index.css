@@ -222,3 +222,23 @@ select option { background: var(--bg-tertiary); }
 .flex-1 { flex: 1; }
 .items-center { align-items: center; }
 .gap-2 { gap: 8px; }
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  .modal {
+    min-width: unset;
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+    padding: 16px;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+  }
+  .modal-sm, .modal-lg { max-width: 100vw; min-width: unset; }
+
+  /* Prevent body scroll when modal open */
+  body.modal-open { overflow: hidden; }
+}

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import ResultsGrid from './ResultsGrid';
 import DiffView from '../DiffView/DiffView';
+import ExecutionPlan from '../ExecutionPlan/ExecutionPlan';
 import useStore from '../../store/useStore';
+import { getQueryPlan } from '../../api/query';
 import './ResultsPanel.css';
 
 export default function ResultsPanel({ tab }) {
@@ -9,7 +11,27 @@ export default function ResultsPanel({ tab }) {
   const [activeResultset, setActiveResultset] = useState(0);
   const [activeConn, setActiveConn] = useState(null);
   const [showDiff, setShowDiff] = useState(false);
-  const [activePane, setActivePane] = useState('results'); // 'results' | 'messages'
+  const [activePane, setActivePane] = useState('results'); // 'results' | 'messages' | 'plan'
+  const [planData, setPlanData] = useState(null);   // { plans: string[], loading: bool, error: string|null }
+
+  const fetchPlan = async () => {
+    if (activePane === 'plan' && planData) return; // already loaded
+    setActivePane('plan');
+    setShowDiff(false);
+    if (planData) return;
+    const { results } = tab;
+    if (!results) return;
+    const connId = results.type === 'multi' ? Object.keys(results.data)[0] : results.connId;
+    const sql = tab.content;
+    if (!connId || !sql) return;
+    setPlanData({ plans: [], loading: true, error: null });
+    try {
+      const res = await getQueryPlan(connId, sql, tab.database);
+      setPlanData({ plans: res.plans || [], loading: false, error: null });
+    } catch (err) {
+      setPlanData({ plans: [], loading: false, error: err.message || 'Failed to fetch plan' });
+    }
+  };
 
   if (tab.executing) {
     return (
@@ -86,9 +108,12 @@ export default function ResultsPanel({ tab }) {
             </button>
           )}
           <MessagesTab count={msgCount} active={activePane === 'messages'} onClick={() => { setActivePane('messages'); setShowDiff(false); }} />
+          <PlanTab active={activePane === 'plan'} onClick={fetchPlan} />
         </div>
 
-        {activePane === 'messages' ? (
+        {activePane === 'plan' ? (
+          <PlanPane planData={planData} />
+        ) : activePane === 'messages' ? (
           <MessagesPanel messages={allMessages} />
         ) : showDiff && canDiff ? (
           <DiffView
@@ -106,23 +131,30 @@ export default function ResultsPanel({ tab }) {
 
   // ── Single connection ─────────────────────────────────────────
   const { recordsets = [] } = results;
+  const showTabsBar = recordsets.length > 1 || msgCount > 0 || true; // always show for Plan tab
   return (
     <div className="results-panel">
-      {(recordsets.length > 1 || msgCount > 0) && (
-        <div className="results-tabs-bar">
-          {recordsets.map((rs, i) => (
-            <button
-              key={i}
-              className={`results-tab ${activePane === 'results' && activeResultset === i ? 'active' : ''}`}
-              onClick={() => { setActiveResultset(i); setActivePane('results'); }}
-            >
-              Result {i + 1} <span className="results-tab-badge">{rs.length}</span>
-            </button>
-          ))}
-          <MessagesTab count={msgCount} active={activePane === 'messages'} onClick={() => setActivePane('messages')} />
-        </div>
-      )}
-      {activePane === 'messages' ? (
+      <div className="results-tabs-bar">
+        {recordsets.map((rs, i) => (
+          <button
+            key={i}
+            className={`results-tab ${activePane === 'results' && activeResultset === i ? 'active' : ''}`}
+            onClick={() => { setActiveResultset(i); setActivePane('results'); }}
+          >
+            {recordsets.length > 1 ? `Result ${i + 1}` : 'Results'} <span className="results-tab-badge">{rs.length}</span>
+          </button>
+        ))}
+        {recordsets.length === 0 && (
+          <button className={`results-tab ${activePane === 'results' ? 'active' : ''}`} onClick={() => setActivePane('results')}>
+            Results
+          </button>
+        )}
+        <MessagesTab count={msgCount} active={activePane === 'messages'} onClick={() => setActivePane('messages')} />
+        <PlanTab active={activePane === 'plan'} onClick={fetchPlan} />
+      </div>
+      {activePane === 'plan' ? (
+        <PlanPane planData={planData} />
+      ) : activePane === 'messages' ? (
         <MessagesPanel messages={allMessages} />
       ) : (
         <ConnResult result={results} activeResultset={activeResultset} setActiveResultset={setActiveResultset} />
@@ -226,6 +258,40 @@ function ConnResult({ result, activeResultset }) {
       )}
     </div>
   );
+}
+
+// ── Plan tab button ───────────────────────────────────────────────────────
+function PlanTab({ active, onClick }) {
+  return (
+    <button
+      className={`results-tab results-tab-plan ${active ? 'active' : ''}`}
+      onClick={onClick}
+      title="Estimated execution plan (SHOWPLAN_XML)"
+    >
+      ⚡ Plan
+    </button>
+  );
+}
+
+// ── Plan pane ────────────────────────────────────────────────────────────
+function PlanPane({ planData }) {
+  if (!planData) {
+    return <div className="results-panel results-empty">Loading execution plan…</div>;
+  }
+  if (planData.loading) {
+    return <div className="results-panel results-loading"><span className="spinner" /><span>Fetching plan…</span></div>;
+  }
+  if (planData.error) {
+    return (
+      <div className="results-panel">
+        <div className="results-error">
+          <div className="results-error-icon">✕</div>
+          <div className="results-error-msg">{planData.error}</div>
+        </div>
+      </div>
+    );
+  }
+  return <ExecutionPlan plans={planData.plans} />;
 }
 
 function downloadCsv(rows, filename) {

@@ -24,4 +24,37 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Tablet: narrower ── */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .left-panel {
+    min-width: 200px !important;
+    max-width: 240px !important;
+    width: 220px !important;
+  }
+}
+
+/* ── Mobile: full-height slide-in drawer ── */
+@media (max-width: 767px) {
+  .left-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 85vw !important;
+    min-width: unset !important;
+    max-width: 320px !important;
+    z-index: 200;
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    transform: translateX(0);
+    animation: drawerSlideIn 0.2s ease;
+  }
+}
+
+@keyframes drawerSlideIn {
+  from { transform: translateX(-100%); opacity: 0.5; }
+  to   { transform: translateX(0);    opacity: 1; }
 }

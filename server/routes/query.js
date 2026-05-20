@@ -95,6 +95,35 @@ router.post('/execute-multi', async (req, res) => {
   res.json(results);
 });
 
+// POST /api/query/plan — returns estimated XML execution plan (no actual execution)
+router.post('/plan', async (req, res) => {
+  const { connectionId, sql: sqlText, database } = req.body;
+  if (!connectionId || !sqlText) return res.status(400).json({ error: 'connectionId and sql required' });
+  try {
+    const pool = db.getPool(connectionId);
+    const request = pool.request();
+    const fullSql = database ? `USE [${database}];\nSET SHOWPLAN_XML ON;\n${sqlText}` : `SET SHOWPLAN_XML ON;\n${sqlText}`;
+    const result = await request.query(fullSql);
+
+    // SHOWPLAN_XML returns one row per statement; each row has one column with the XML plan
+    const plans = [];
+    const recordsets = result.recordsets || (result.recordset ? [result.recordset] : []);
+    for (const rs of recordsets) {
+      if (rs && rs.length > 0) {
+        const firstRow = rs[0];
+        const xml = Object.values(firstRow)[0];
+        if (xml && typeof xml === 'string' && xml.trim().startsWith('<')) {
+          plans.push(xml);
+        }
+      }
+    }
+
+    res.json({ plans, success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 router.get('/history', (req, res) => res.json(cache.getHistory()));
 router.delete('/history', (req, res) => { cache.clearHistory(); res.json({ success: true }); });
 

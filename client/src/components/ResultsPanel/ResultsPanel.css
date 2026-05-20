@@ -47,6 +47,9 @@
 }
 .results-tab-badge.error { background: var(--error-bg); color: var(--error); }
 .results-tab-diff { font-weight: 600; color: var(--accent) !important; }
+.results-tab-plan { font-weight: 500; }
+.results-tab-messages { font-weight: 500; }
+.results-tab-badge-msg { background: rgba(255,152,0,0.18) !important; color: #ff9800 !important; }
 
 /* Content area — must fill and allow inner scroll */
 .results-content {

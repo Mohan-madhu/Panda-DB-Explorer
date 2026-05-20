@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useStore from './store/useStore';
 import Topbar from './components/Topbar/Topbar';
 import LeftPanel from './components/LeftPanel/LeftPanel';
@@ -11,14 +11,12 @@ import SnippetsPanel from './components/SnippetsPanel/SnippetsPanel';
 import ShortcutsModal from './components/ShortcutsModal/ShortcutsModal';
 import { getConnections } from './api/connections';
 import './App.css';
-import { useState } from 'react';
 
 export default function App() {
   const {
     showConnectionModal, showNewQueryModal, showHistory, contextMenu, closeContextMenu,
-    setConnections, theme, explorerCollapsed,
+    setConnections, theme, explorerCollapsed, toggleExplorerCollapsed,
     showSnippets, setShowShortcuts, showShortcuts,
-    tabs, activeTabId, updateTab,
   } = useStore();
 
   const [leftWidth, setLeftWidth] = useState(260);
@@ -26,7 +24,8 @@ export default function App() {
   const startX = useRef(0);
   const startW = useRef(0);
 
-  // Apply theme to document root
+  const isMobile = () => window.innerWidth < 768;
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -41,7 +40,6 @@ export default function App() {
     return () => document.removeEventListener('click', handler);
   }, []);
 
-  // Global keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
       if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
@@ -53,7 +51,7 @@ export default function App() {
   }, []);
 
   const onResizerMouseDown = (e) => {
-    if (explorerCollapsed) return;
+    if (explorerCollapsed || isMobile()) return;
     dragging.current = true;
     startX.current = e.clientX;
     startW.current = leftWidth;
@@ -64,7 +62,7 @@ export default function App() {
     const onMove = (e) => {
       if (!dragging.current) return;
       const delta = e.clientX - startX.current;
-      setLeftWidth(Math.max(180, Math.min(600, startW.current + delta)));
+      setLeftWidth(Math.max(180, Math.min(480, startW.current + delta)));
     };
     const onUp = () => { dragging.current = false; };
     window.addEventListener('mousemove', onMove);
@@ -72,24 +70,36 @@ export default function App() {
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, []);
 
-  // Insert snippet at active editor cursor
   const handleSnippetInsert = (sql) => {
-    // The active tab's editor — trigger via tab content update with appended text
-    // Monaco editors handle their own state; best approach is to dispatch a custom event
     window.dispatchEvent(new CustomEvent('mssql-insert-snippet', { detail: { sql } }));
   };
+
+  // On mobile, panel is a drawer; on desktop it respects explorerCollapsed
+  const showPanel = !explorerCollapsed;
+  const mobile = isMobile();
 
   return (
     <div className="app">
       <Topbar />
       <div className="app-body">
-        {!explorerCollapsed && (
-          <>
-            <LeftPanel style={{ width: leftWidth, minWidth: leftWidth, maxWidth: leftWidth }} />
-            <div className="resizer-v" onMouseDown={onResizerMouseDown} />
-          </>
+        {/* Mobile backdrop — closes drawer on tap */}
+        {showPanel && mobile && (
+          <div className="drawer-backdrop" onClick={toggleExplorerCollapsed} />
         )}
+
+        {showPanel && (
+          <LeftPanel
+            className={mobile ? 'drawer-open' : ''}
+            style={!mobile ? { width: leftWidth, minWidth: leftWidth, maxWidth: leftWidth } : {}}
+          />
+        )}
+
+        {!explorerCollapsed && !mobile && (
+          <div className="resizer-v" onMouseDown={onResizerMouseDown} />
+        )}
+
         <QueryWorkspace />
+
         {showSnippets && (
           <SnippetsPanel onInsert={handleSnippetInsert} />
         )}
