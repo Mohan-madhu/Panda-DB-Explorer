@@ -1,0 +1,9 @@
+Full object scripting — SSMS can generate a complete CREATE TABLE script with all constraints, indexes, triggers for any object. This tool only scripts basic DML.
+
+Add this too
+
+Where SSMS still wins completely:
+
+Execution plans — Visual query plans, estimated vs actual, index recommendations. This is the #1 performance tuning tool and there's nothing close to it here.
+
+add this in out project too very more then effieitnec m esasy m a onboarding too for this in out product, auto commit, sync
