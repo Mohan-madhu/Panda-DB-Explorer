@@ -503,7 +503,34 @@ The server reads no `.env` file by default. You can set:
 PORT=3001          # Express server port (default: 3001)
 ```
 
-The Vite dev server proxies all `/api` requests to `http://localhost:3001` (see `client/vite.config.js`).
+The client reads this build-time environment variable:
+
+```bash
+VITE_API_BASE_URL=/api
+```
+
+Use one of these deployment patterns:
+
+1. Same-origin reverse proxy:
+   - Serve the frontend at your normal app domain.
+   - Proxy frontend `/api/*` to the backend.
+   - Keep `VITE_API_BASE_URL=/api`.
+
+2. Separate API subdomain:
+   - Host the backend at `https://pandadbapi.sheetspanda.in`.
+   - Build the client with:
+
+```bash
+VITE_API_BASE_URL=https://pandadbapi.sheetspanda.in/api
+```
+
+If your reverse proxy maps the backend root directly to Express routes without an `/api` prefix, use:
+
+```bash
+VITE_API_BASE_URL=https://pandadbapi.sheetspanda.in
+```
+
+The Vite dev server still proxies local `/api` requests to `http://localhost:3001` when `VITE_API_BASE_URL` is left as `/api` (see `client/vite.config.js`).
 
 ---
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload } from 'lucide-react';
 import Papa from 'papaparse';
-import axios from 'axios';
+import { importCsvRows } from '../../api/import';
 import './ImportCsvModal.css';
 
 export default function ImportCsvModal({ connId, database, schema, table, tableColumns, onClose }) {
@@ -48,13 +48,13 @@ export default function ImportCsvModal({ connId, database, schema, table, tableC
 
     setImporting(true);
     try {
-      const res = await axios.post(`/api/import/${connId}/databases/${database}/tables/${schema}/${table}`, {
+      const res = await importCsvRows(connId, database, schema, table, {
         columns: targetCols,
         rows,
       });
-      setDone(res.data.inserted);
+      setDone(res.inserted);
     } catch (err) {
-      setStatus(`Error: ${err.response?.data?.error || err.message}`);
+      setStatus(`Error: ${err.message}`);
     } finally {
       setImporting(false);
     }

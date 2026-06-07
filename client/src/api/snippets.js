@@ -1,6 +1,6 @@
-import axios from 'axios';
+import client from './client';
 
-export const getSnippets = () => axios.get('/api/snippets').then(r => r.data);
-export const createSnippet = (data) => axios.post('/api/snippets', data).then(r => r.data);
-export const updateSnippet = (id, data) => axios.put(`/api/snippets/${id}`, data).then(r => r.data);
-export const deleteSnippet = (id) => axios.delete(`/api/snippets/${id}`).then(r => r.data);
+export const getSnippets = () => client.get('/snippets').then(r => r.data);
+export const createSnippet = (data) => client.post('/snippets', data).then(r => r.data);
+export const updateSnippet = (id, data) => client.put(`/snippets/${id}`, data).then(r => r.data);
+export const deleteSnippet = (id) => client.delete(`/snippets/${id}`).then(r => r.data);
