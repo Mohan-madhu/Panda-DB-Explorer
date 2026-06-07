@@ -42,7 +42,7 @@ export default function Topbar() {
 
       <div className="topbar-brand">
         <Database size={15} />
-        <span>MSSQL Web</span>
+        <span>Panda DB Explorer</span>
       </div>
 
       <div className="topbar-sep" />
