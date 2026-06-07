@@ -4,113 +4,339 @@ A full-featured, web-based SQL Server Management Studio (SSMS) alternative — b
 
 ---
 
-## Features
+## Features And How To Use Them
 
 ### Connections
-- **Multiple simultaneous connections** — connect to different servers at the same time; each query tab targets one or more of them
-- **Saved credentials** — connection profiles stored server-side; one-click reconnect on next launch
-- **Connection groups & color tags** — label connections (e.g. "Production", "Dev") with a color for quick visual identification
-- **Status pills** in the topbar show live connection state (connected / connecting / error / disconnected)
+
+Panda DB Explorer can connect to one or more SQL Server instances at the same time. Each connection appears as a status pill in the topbar and as a root node in Object Explorer.
+
+How to use:
+
+1. Click **New Connection** in the topbar.
+2. Enter server, port, default database, username, and password.
+3. Keep **Encrypt connection** and **Trust server certificate** enabled for common local/dev SQL Server setups.
+4. Optionally add a group name and color, such as `Dev`, `QA`, or `Production`.
+5. Click **Connect**.
+
+After saving, use the connection pill in the topbar to reconnect or disconnect. Existing connection profiles are stored in `server/data/connections.json`.
+
+### Connection Groups And Tags
+
+Groups and colors help distinguish servers when many connections are open.
+
+How to use:
+
+1. Open **New Connection** or edit an existing connection.
+2. Fill **Group / Tag**.
+3. Pick a color swatch.
+4. Save the connection.
+
+The color appears on the topbar connection pill and the Object Explorer connection header.
 
 ### Object Explorer
-- Full tree: **Databases → Tables / Views / Stored Procedures / Functions**
-- **Column details** inline: type, size, nullable, PK 🔑, identity 🔢
-- **Search / filter** bar — instantly filter all objects by name across the entire tree
-- Right-click tables: Select Top 1000, Edit/CRUD, **Script CREATE TABLE**, Script SELECT / INSERT / UPDATE / DELETE, **Import CSV**
-- **Full object scripting** — generates CREATE scripts for tables, views, stored procedures, and functions
-- Table scripts include columns, computed columns, defaults, primary/unique keys, checks, foreign keys, non-constraint indexes, and triggers
-- Right-click views: **Script CREATE VIEW**, View Definition, Select Top 1000
-- Right-click SPs: **Script CREATE PROCEDURE**, View Definition, Script EXEC, **Execute with Parameters** (auto-loads param list)
-- Right-click functions: **Script CREATE FUNCTION**, View Definition, Script SELECT
-- Refresh individual connections or databases on demand
+
+Object Explorer shows the live SQL Server structure for each connected server: databases, tables, views, stored procedures, functions, and table columns.
+
+How to use:
+
+1. Connect to a server.
+2. Expand the connection in the left panel.
+3. Expand **Databases**.
+4. Click a database to make it the active database for new query tabs.
+5. Expand **Tables**, **Views**, **Stored Procedures**, or **Functions**.
+6. Expand a table to load its columns, data types, nullability, primary key marker, and identity marker.
+7. Use the search box at the top of Object Explorer to filter objects by name or schema.
+
+Right-click actions are available on tables, views, stored procedures, and functions.
+
+### Full Object Scripting
+
+The app can generate `CREATE` scripts for database objects. This is useful for copying schema into another environment, reviewing table design, or versioning object definitions.
+
+How to use:
+
+1. Open Object Explorer.
+2. Right-click a table, view, stored procedure, or function.
+3. Choose the relevant script action:
+   - **Script CREATE TABLE**
+   - **Script CREATE VIEW**
+   - **Script CREATE PROCEDURE**
+   - **Script CREATE FUNCTION**
+4. A new query tab opens with the generated script.
+
+Table scripts include columns, computed columns, defaults, primary keys, unique keys, check constraints, foreign keys, non-constraint indexes, filtered indexes, included columns, and triggers when SQL Server exposes them.
+
+### Table DML Scripts
+
+For quick query creation, the table context menu can generate basic DML templates.
+
+How to use:
+
+1. Right-click a table in Object Explorer.
+2. Choose **Script SELECT**, **Script INSERT**, **Script UPDATE**, or **Script DELETE**.
+3. Edit the generated template in the query editor.
+4. Run it with **F5** or **Ctrl+Enter**.
+
+These templates are starter SQL, not full object scripts.
+
+### View, Procedure, And Function Definitions
+
+Views, stored procedures, and functions can be opened directly from Object Explorer.
+
+How to use:
+
+1. Right-click a view, stored procedure, or function.
+2. Choose **View Definition** to open the stored module text.
+3. Choose **Script CREATE ...** when you want a create script tab.
+4. For procedures, choose **Script EXEC** when you want a simple execution template.
+5. For functions, choose **Script SELECT** when you want a function call template.
+
+Encrypted SQL Server modules may not return source text.
+
+### Stored Procedure Parameter Prompt
+
+Stored procedures can be executed through a generated parameter form.
+
+How to use:
+
+1. Expand **Stored Procedures** in Object Explorer.
+2. Right-click a procedure.
+3. Choose **Execute with Parameters...**.
+4. Fill the input form generated from SQL Server parameter metadata.
+5. Click **Execute**.
+
+The app opens a new query tab with an `EXEC` statement containing the supplied values.
+
+### Query Workspace And Tabs
+
+The query workspace supports multiple tabs. Each tab can target one connection, one database, or multiple connections.
+
+How to use:
+
+1. Click the `+` button in the tab bar to create a new query.
+2. Select a connection from the editor toolbar.
+3. Select a database from the **DB** selector.
+4. Write SQL in the editor.
+5. Run the full query or select part of the text and run only the selection.
+
+Tabs are auto-saved to browser `localStorage`, excluding result data.
 
 ### Monaco SQL Editor
-- Syntax highlighting with **custom MSSQL dark & light themes**
-- **IntelliSense** — tables, columns, views, SPs, functions, SQL keywords, all client-side (no extra server calls)
-  - Dot-trigger: `tableName.` → shows that table's columns with type info
-  - `Ctrl+Space` for manual trigger anywhere
-- **SQL Formatter** (`Ctrl+Shift+F`) — formats the editor content using TSQL dialect
-- **Fold / Unfold all** and **Word Wrap** toggle buttons
-- **Multi-tab** workspace — unlimited query tabs, auto-named "Query 1", "Query 2", …
-- **Auto-save tabs** to `localStorage` — tabs survive browser refresh
-- Execute selected text or full query with **F5** or **Ctrl+Enter**
-- Save / download query as `.sql` file
-- Each tab binds to a connection + database; **multi-connection execution** runs the same SQL on multiple servers in parallel
+
+The editor uses Monaco with SQL syntax highlighting, SQL formatting, folding, word wrap, and schema-aware suggestions.
+
+How to use:
+
+1. Write SQL in a query tab.
+2. Press **Ctrl+Space** to trigger suggestions manually.
+3. Type a table alias or table name followed by `.` to see column suggestions when column metadata is loaded.
+4. Click the `{;}` toolbar button or press **Ctrl+Shift+F** to format SQL.
+5. Use fold/unfold buttons for large SQL files.
+6. Toggle word wrap when working with long lines.
+
+IntelliSense uses schema information already loaded through Object Explorer.
+
+### Executing Queries
+
+Queries can run against one connected server or multiple connected servers.
+
+How to use:
+
+1. Select the target connection in the query toolbar.
+2. Select the target database.
+3. Write SQL.
+4. Press **F5** or **Ctrl+Enter**.
+5. To run only part of a script, select the SQL text first, then execute.
+
+For multi-server execution, check multiple connection boxes in the connection selector. The same SQL is sent to each selected server.
 
 ### Query Variables UI
-- Before executing, the editor scans for undeclared `@params`
-- A prompt modal appears to fill values — execution prepends the `DECLARE` statements automatically
+
+The app detects undeclared `@variables` before execution and prompts you for values.
+
+How to use:
+
+1. Write SQL using variables, for example `WHERE CustomerId = @customerId`.
+2. Run the query.
+3. Fill the parameter modal.
+4. Click **Execute**.
+
+The app prepends generated `DECLARE` statements before running the SQL.
 
 ### Transaction Toolbar
-- **BEGIN / COMMIT / ROLLBACK** buttons in the editor toolbar
-- Orange pulsing badge + top-border indicator when a transaction is open on the active connection
+
+The toolbar includes **BEGIN**, **COMMIT**, and **ROLLBACK** buttons.
+
+How to use:
+
+1. Select a connection and database.
+2. Click **BEGIN** to start a transaction.
+3. Run your SQL.
+4. Click **COMMIT** to save changes or **ROLLBACK** to undo them.
+
+When a transaction is marked open, the editor shows a transaction badge and visual indicator. Use this carefully on shared or production databases.
 
 ### Results Grid
-- Sortable columns (click header)
-- **Row filter bar** — type to filter visible rows across all columns instantly, shows `match / total` count
-- **Column selection** — click `☐` in any header to select the whole column; `Ctrl+click` for multi-select
-- Right-click context menu: copy selected column values / with headers, copy all rows / with headers
-- **Column headers shown even for 0-row results** (server sends column metadata)
-- **CSV download** of current result set
-- Row numbers sticky column
 
-### Execution Plans
-- **Estimated execution plan** tab using SQL Server `SHOWPLAN_XML` without running the query
-- **Actual execution plan** mode using `STATISTICS XML`; this executes the query again and shows runtime row counters when SQL Server returns them
-- Visual operator tree with estimated rows, actual rows, relative subtree cost, object/index labels, and high-cost highlighting
-- **Missing index recommendations** parsed from plan XML with equality, inequality, included columns, impact, and a generated `CREATE INDEX` draft
-- Useful for onboarding and tuning: inspect whether queries scan, seek, sort, join, or spill into expensive plan sections before changing indexes or SQL
+Query results appear in a grid with sorting, filtering, copy tools, and CSV download.
+
+How to use:
+
+1. Run a query that returns rows.
+2. Click a column header to sort.
+3. Use the filter input to search across all visible columns.
+4. Click the checkbox in a header to select an entire column.
+5. Use **Ctrl+click** on column checkboxes to select multiple columns.
+6. Right-click the grid to copy selected columns, copy with headers, or copy all rows.
+7. Click **CSV** to download the current result set.
+
+When SQL Server returns metadata for an empty result set, the grid still shows column headers.
 
 ### Messages Tab
-- Separate **Messages** tab next to Results — shows all `PRINT` and `RAISERROR` output from stored procedures
-- Displays line number, procedure name, and (in multi-connection mode) which server each message came from
-- Orange badge counter on the tab when messages are present
+
+The Messages tab shows SQL Server informational output.
+
+How to use:
+
+1. Run SQL that uses `PRINT` or low-severity `RAISERROR`.
+2. Open the **Messages** tab next to Results.
+3. Review message text, line number, procedure name, and connection label for multi-server runs.
+
+The Messages tab shows a badge when messages are present.
+
+### Execution Plans
+
+The Plan tab helps tune queries by showing SQL Server execution plans.
+
+How to use estimated plans:
+
+1. Run a query.
+2. Click **Plan** in the results area.
+3. Leave **Estimated** selected.
+4. Review operators, estimated rows, subtree cost, object/index labels, and highlighted expensive operators.
+
+Estimated plans use SQL Server `SHOWPLAN_XML` and do not execute the query again.
+
+How to use actual plans:
+
+1. Open the **Plan** tab.
+2. Click **Actual**.
+3. Confirm that the query should run again.
+4. Review actual rows and runtime counters when SQL Server returns them.
+
+Actual plans use `STATISTICS XML`, so they execute the SQL again. Be careful with write queries.
+
+Missing index recommendations:
+
+1. Open a plan that contains missing-index data.
+2. Review the **Missing index recommendations** section.
+3. Check impact, equality columns, inequality columns, and included columns.
+4. Treat the generated `CREATE INDEX` statement as a draft, then verify it before applying it.
 
 ### Multi-Connection Diff View
-- When running on exactly 2 connections, a **⟺ Diff** tab appears
-- Side-by-side grids highlight changed cells, missing rows; summary badges show identical / different / only-left / only-right counts
+
+When a query runs against exactly two connections, the app can compare result sets side by side.
+
+How to use:
+
+1. Select exactly two connections for a query tab.
+2. Run the query.
+3. Click **Diff** in the results tabs.
+4. Review identical rows, changed rows, rows only on the left, and rows only on the right.
+
+This is useful for comparing environments such as dev vs production.
 
 ### CRUD Modal
-- Right-click any table → Edit / CRUD
-- Paginated table viewer with inline row editor
-- Insert, update, delete rows — all fully parameterized
+
+The CRUD modal provides a simple table editor.
+
+How to use:
+
+1. Right-click a table in Object Explorer.
+2. Choose **Edit / CRUD**.
+3. Click the edit button beside a row to update it.
+4. Click **New Row** to insert.
+5. Select a row and click **Delete** to remove it.
+6. Use pagination controls to move through large tables.
+
+Update and delete actions rely on primary key metadata.
+
+### Import CSV To Table
+
+CSV import maps file columns to table columns and inserts rows through the server.
+
+How to use:
+
+1. Right-click a table.
+2. Choose **Import CSV**.
+3. Pick a `.csv` or `.txt` file.
+4. Review the column mapping. Matching names are mapped automatically.
+5. Preview the first rows.
+6. Click **Import**.
+
+The server imports rows inside a transaction. Large CSV files may take time because rows are inserted one by one.
 
 ### Query Snippets
-- `Code2` button in topbar opens the Snippets side-panel
-- Save named SQL snippets with optional tags; click to insert at cursor
-- Persisted server-side in `server/data/snippets.json`
 
-### SP Parameter Prompt
-- Right-click a Stored Procedure → **Execute with Parameters…**
-- Form auto-generated from the SP's parameter list (name, type, direction)
-- Opens a new query tab with the `EXEC` statement pre-filled
+Snippets store reusable SQL blocks.
 
-### Import CSV → Table
-- Right-click any table → **Import CSV**
-- Pick a CSV file — columns are auto-mapped by name (case-insensitive)
-- Preview first 5 rows; bulk-insert via a server-side transaction
+How to use:
 
-### SQL Formatter
-- `Ctrl+Shift+F` or the `{;}` toolbar button formats the full editor using TSQL dialect
-- Keywords uppercased, 4-space indentation
+1. Click the **Code2** button in the topbar.
+2. Click `+` to create a snippet.
+3. Enter a name, SQL text, and optional comma-separated tags.
+4. Save it.
+5. Click a snippet to insert it into the active editor.
+
+Snippets are stored in `server/data/snippets.json`.
+
+### Query Files
+
+Queries can be saved as `.sql` files on the server.
+
+How to use:
+
+1. Write a query in a tab.
+2. Click **Save**.
+3. Enter a query name.
+4. The app stores the SQL under `server/data/queries/`.
+5. Click the download button if you want a browser `.sql` download.
+
+Saved query metadata includes associated connection IDs and default database.
 
 ### Query History
-- Click **History** (clock icon in topbar) to browse past queries
-- Searchable; click ▶ to reopen any query in a new tab
-- Stored server-side (`server/data/history.json`), max 500 entries
 
-### Connection Groups / Tags
-- Assign a **group name** and **color** to any connection in the Connection modal
-- Color shown as bottom-border on the topbar pill and left-border in the Object Explorer
-- Group badge shown inside the pill and explorer header
+The app records recent query executions.
+
+How to use:
+
+1. Click the clock icon in the topbar.
+2. Search the history list.
+3. Click the play button beside an entry to reopen it in a new tab.
+4. Click **Clear** to delete stored history.
+
+History is stored in `server/data/history.json` and is capped at 500 entries.
 
 ### Keyboard Shortcuts Modal
-- Press **`?`** or click the `?` button in the topbar
-- Full reference table of all shortcuts grouped by category
+
+The shortcuts modal lists available keyboard actions.
+
+How to use:
+
+1. Press `?` while focus is not inside an input, or click the `?` button in the topbar.
+2. Review shortcuts grouped by editor, navigation, results, transaction, and app actions.
+
+Common shortcuts include **F5**, **Ctrl+Enter**, **Ctrl+Shift+F**, **Ctrl+Space**, and **Ctrl+S**.
 
 ### Theme
-- **Dark / Light mode** toggle (Sun/Moon button in topbar)
-- Persisted to `localStorage`
+
+The app supports dark and light themes.
+
+How to use:
+
+1. Click the sun/moon button in the topbar.
+2. The selected theme is saved in browser `localStorage`.
+3. Monaco editor theme and app UI update together.
 
 ---
 
