@@ -8,6 +8,7 @@ import {
 import './ResultsGrid.css';
 
 const MAX_CELL = 256;
+const UNNAMED_COL = '(No column name)';
 
 function fmt(value) {
   if (value === null || value === undefined) return { text: 'NULL', isNull: true };
@@ -30,13 +31,38 @@ export default function ResultsGrid({ rows, columns: columnsProp }) {
     const keys = columnsProp?.length
       ? columnsProp
       : rows.length ? Object.keys(rows[0]) : [];
-    return keys.map(key => ({
-      id: key,
-      accessorKey: key,
-      header: key,
-      size: 120,
-    }));
+    const seen = new Map();
+    return keys.map((key, index) => {
+      const rawKey = key == null ? '' : String(key);
+      const baseId = rawKey.trim() || `__unnamed_${index}`;
+      const count = seen.get(baseId) || 0;
+      seen.set(baseId, count + 1);
+      const id = count > 0 ? `${baseId}_${count}` : baseId;
+      const header = rawKey.trim() || UNNAMED_COL;
+
+      return {
+        id,
+        meta: { rawKey, header },
+        accessorFn: row => row[rawKey],
+        header,
+        size: 120,
+      };
+    });
   }, [rows, columnsProp]);
+
+  const columnById = useMemo(() => {
+    return new Map(columns.map(col => [col.id, col]));
+  }, [columns]);
+
+  const getColumnValue = (row, colId) => {
+    const col = columnById.get(colId);
+    return row[col?.meta?.rawKey ?? colId];
+  };
+
+  const getColumnHeader = (colId) => {
+    const col = columnById.get(colId);
+    return col?.meta?.header || colId;
+  };
 
   // Client-side row filter — checks every cell value
   const filteredRows = useMemo(() => {
@@ -44,12 +70,12 @@ export default function ResultsGrid({ rows, columns: columnsProp }) {
     const q = filterText.toLowerCase();
     return rows.filter(row =>
       columns.some(col => {
-        const v = row[col.id];
+        const v = getColumnValue(row, col.id);
         if (v == null) return false;
         return String(v).toLowerCase().includes(q);
       })
     );
-  }, [rows, columns, filterText]);
+  }, [rows, columns, columnById, filterText]);
 
   const table = useReactTable({
     data: filteredRows,
@@ -81,10 +107,10 @@ export default function ResultsGrid({ rows, columns: columnsProp }) {
   const buildText = (cols, withHeader) => {
     const sortedRows = table.getRowModel().rows.map(r => r.original);
     const lines = [];
-    if (withHeader) lines.push(cols.join('\t'));
+    if (withHeader) lines.push(cols.map(getColumnHeader).join('\t'));
     sortedRows.forEach(row => {
       lines.push(cols.map(c => {
-        const v = row[c];
+        const v = getColumnValue(row, c);
         return v == null ? '' : String(v);
       }).join('\t'));
     });
