@@ -12,24 +12,24 @@ export default function ResultsPanel({ tab }) {
   const [activeConn, setActiveConn] = useState(null);
   const [showDiff, setShowDiff] = useState(false);
   const [activePane, setActivePane] = useState('results'); // 'results' | 'messages' | 'plan'
-  const [planData, setPlanData] = useState(null);   // { plans: string[], loading: bool, error: string|null }
+  const [planData, setPlanData] = useState(null);   // { plans: string[], loading: bool, error: string|null, mode: string }
 
-  const fetchPlan = async () => {
-    if (activePane === 'plan' && planData) return; // already loaded
+  const fetchPlan = async (mode = 'estimated', force = false) => {
+    if (activePane === 'plan' && planData?.mode === mode && !force) return;
     setActivePane('plan');
     setShowDiff(false);
-    if (planData) return;
+    if (planData?.mode === mode && !force) return;
     const { results } = tab;
     if (!results) return;
     const connId = results.type === 'multi' ? Object.keys(results.data)[0] : results.connId;
     const sql = tab.content;
     if (!connId || !sql) return;
-    setPlanData({ plans: [], loading: true, error: null });
+    setPlanData({ plans: [], loading: true, error: null, mode });
     try {
-      const res = await getQueryPlan(connId, sql, tab.database);
-      setPlanData({ plans: res.plans || [], loading: false, error: null });
+      const res = await getQueryPlan(connId, sql, tab.database, mode);
+      setPlanData({ plans: res.plans || [], loading: false, error: null, mode: res.mode || mode });
     } catch (err) {
-      setPlanData({ plans: [], loading: false, error: err.message || 'Failed to fetch plan' });
+      setPlanData({ plans: [], loading: false, error: err.message || 'Failed to fetch plan', mode });
     }
   };
 
@@ -108,11 +108,11 @@ export default function ResultsPanel({ tab }) {
             </button>
           )}
           <MessagesTab count={msgCount} active={activePane === 'messages'} onClick={() => { setActivePane('messages'); setShowDiff(false); }} />
-          <PlanTab active={activePane === 'plan'} onClick={fetchPlan} />
+          <PlanTab active={activePane === 'plan'} onClick={() => fetchPlan('estimated')} />
         </div>
 
         {activePane === 'plan' ? (
-          <PlanPane planData={planData} />
+          <PlanPane planData={planData} onFetchPlan={fetchPlan} />
         ) : activePane === 'messages' ? (
           <MessagesPanel messages={allMessages} />
         ) : showDiff && canDiff ? (
@@ -150,10 +150,10 @@ export default function ResultsPanel({ tab }) {
           </button>
         )}
         <MessagesTab count={msgCount} active={activePane === 'messages'} onClick={() => setActivePane('messages')} />
-        <PlanTab active={activePane === 'plan'} onClick={fetchPlan} />
+        <PlanTab active={activePane === 'plan'} onClick={() => fetchPlan('estimated')} />
       </div>
       {activePane === 'plan' ? (
-        <PlanPane planData={planData} />
+        <PlanPane planData={planData} onFetchPlan={fetchPlan} />
       ) : activePane === 'messages' ? (
         <MessagesPanel messages={allMessages} />
       ) : (
@@ -274,16 +274,18 @@ function PlanTab({ active, onClick }) {
 }
 
 // ── Plan pane ────────────────────────────────────────────────────────────
-function PlanPane({ planData }) {
+function PlanPane({ planData, onFetchPlan }) {
   if (!planData) {
     return <div className="results-panel results-empty">Loading execution plan…</div>;
   }
+  const mode = planData.mode || 'estimated';
   if (planData.loading) {
-    return <div className="results-panel results-loading"><span className="spinner" /><span>Fetching plan…</span></div>;
+    return <div className="results-panel results-loading"><span className="spinner" /><span>Fetching {mode} plan…</span></div>;
   }
   if (planData.error) {
     return (
       <div className="results-panel">
+        <PlanModeBar mode={mode} onFetchPlan={onFetchPlan} />
         <div className="results-error">
           <div className="results-error-icon">✕</div>
           <div className="results-error-msg">{planData.error}</div>
@@ -291,7 +293,34 @@ function PlanPane({ planData }) {
       </div>
     );
   }
-  return <ExecutionPlan plans={planData.plans} />;
+  return (
+    <div className="results-panel">
+      <PlanModeBar mode={mode} onFetchPlan={onFetchPlan} />
+      <ExecutionPlan plans={planData.plans} mode={mode} />
+    </div>
+  );
+}
+
+function PlanModeBar({ mode, onFetchPlan }) {
+  return (
+    <div className="plan-mode-bar">
+      <button className={`plan-mode-btn ${mode === 'estimated' ? 'active' : ''}`} onClick={() => onFetchPlan('estimated', true)}>
+        Estimated
+      </button>
+      <button
+        className={`plan-mode-btn ${mode === 'actual' ? 'active' : ''}`}
+        onClick={() => {
+          if (window.confirm('Actual execution plan will run the query again. Continue?')) onFetchPlan('actual', true);
+        }}
+        title="Runs the query with SET STATISTICS XML ON"
+      >
+        Actual
+      </button>
+      <span className="plan-mode-note">
+        {mode === 'actual' ? 'Actual rows and runtime counters are shown when SQL Server returns them.' : 'Estimated plan does not execute the query.'}
+      </span>
+    </div>
+  );
 }
 
 function downloadCsv(rows, filename) {

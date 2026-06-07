@@ -59,6 +59,58 @@
 .ep-legend-sep { flex: 1; }
 .ep-legend-total { color: var(--text-secondary); font-size: 11px; }
 
+.ep-missing-indexes {
+  flex-shrink: 0;
+  max-height: 180px;
+  overflow: auto;
+  padding: 8px 12px;
+  background: rgba(255, 167, 38, 0.06);
+  border-bottom: 1px solid rgba(255, 167, 38, 0.25);
+}
+.ep-mi-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffa726;
+  margin-bottom: 6px;
+}
+.ep-mi-item {
+  border: 1px solid rgba(255, 167, 38, 0.25);
+  background: var(--bg-secondary);
+  border-radius: 5px;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+.ep-mi-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ep-mi-impact {
+  font-weight: 700;
+  color: #ffa726;
+}
+.ep-mi-table {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ep-mi-cols {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.ep-mi-sql {
+  margin: 6px 0 0;
+  padding: 6px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 10px;
+  overflow: auto;
+}
+
 /* Scrollable tree container */
 .ep-tree-scroll {
   flex: 1;
@@ -123,9 +175,15 @@
   font-size: 10px; color: var(--text-muted);
 }
 .ep-rows { white-space: nowrap; }
+.ep-actual-rows { color: var(--accent); }
 .ep-object {
   flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   color: var(--accent); font-size: 10px;
+}
+.ep-runtime {
+  margin-top: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
 }
 
 /* Cost bar */

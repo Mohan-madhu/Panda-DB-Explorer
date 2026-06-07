@@ -16,10 +16,12 @@ A full-featured, web-based SQL Server Management Studio (SSMS) alternative — b
 - Full tree: **Databases → Tables / Views / Stored Procedures / Functions**
 - **Column details** inline: type, size, nullable, PK 🔑, identity 🔢
 - **Search / filter** bar — instantly filter all objects by name across the entire tree
-- Right-click tables: Select Top 1000, Edit/CRUD, Script SELECT / INSERT / UPDATE / DELETE, **Import CSV**
-- Right-click views: View Definition, Select Top 1000
-- Right-click SPs: View Definition, Script EXEC, **Execute with Parameters** (auto-loads param list)
-- Right-click functions: View Definition, Script SELECT
+- Right-click tables: Select Top 1000, Edit/CRUD, **Script CREATE TABLE**, Script SELECT / INSERT / UPDATE / DELETE, **Import CSV**
+- **Full object scripting** — generates CREATE scripts for tables, views, stored procedures, and functions
+- Table scripts include columns, computed columns, defaults, primary/unique keys, checks, foreign keys, non-constraint indexes, and triggers
+- Right-click views: **Script CREATE VIEW**, View Definition, Select Top 1000
+- Right-click SPs: **Script CREATE PROCEDURE**, View Definition, Script EXEC, **Execute with Parameters** (auto-loads param list)
+- Right-click functions: **Script CREATE FUNCTION**, View Definition, Script SELECT
 - Refresh individual connections or databases on demand
 
 ### Monaco SQL Editor
@@ -51,6 +53,13 @@ A full-featured, web-based SQL Server Management Studio (SSMS) alternative — b
 - **Column headers shown even for 0-row results** (server sends column metadata)
 - **CSV download** of current result set
 - Row numbers sticky column
+
+### Execution Plans
+- **Estimated execution plan** tab using SQL Server `SHOWPLAN_XML` without running the query
+- **Actual execution plan** mode using `STATISTICS XML`; this executes the query again and shows runtime row counters when SQL Server returns them
+- Visual operator tree with estimated rows, actual rows, relative subtree cost, object/index labels, and high-cost highlighting
+- **Missing index recommendations** parsed from plan XML with equality, inequality, included columns, impact, and a generated `CREATE INDEX` draft
+- Useful for onboarding and tuning: inspect whether queries scan, seek, sort, join, or spill into expensive plan sections before changing indexes or SQL
 
 ### Messages Tab
 - Separate **Messages** tab next to Results — shows all `PRINT` and `RAISERROR` output from stored procedures
@@ -223,10 +232,13 @@ Panda-DB-Explorer/
 | GET | `/api/explorer/:id/databases` | List databases |
 | GET | `/api/explorer/:id/databases/:db/tree` | Tables, views, SPs, functions |
 | GET | `/api/explorer/:id/databases/:db/tables/:schema/:table/columns` | Column metadata |
+| GET | `/api/explorer/:id/databases/:db/tables/:schema/:table/script` | Full CREATE TABLE script with constraints, indexes, triggers |
+| GET | `/api/explorer/:id/databases/:db/script/:schema/:name` | CREATE script for table, view, stored procedure, or function |
 | GET | `/api/explorer/:id/databases/:db/definition/:schema/:name` | SP / View source |
 | GET | `/api/explorer/:id/databases/:db/sp-params/:schema/:name` | SP parameter list |
 | POST | `/api/query/execute` | Run SQL (single connection) |
 | POST | `/api/query/execute-multi` | Run SQL (multiple connections, parallel) |
+| POST | `/api/query/plan` | Estimated or actual XML execution plan for a query |
 | GET | `/api/query/history` | Query history |
 | GET | `/api/crud` | Paginated table rows |
 | POST | `/api/crud` | Insert row |

@@ -4,10 +4,13 @@ import './ExecutionPlan.css';
 // ── XML parsing helpers ───────────────────────────────────────────────────
 
 function buildTree(relOpEl) {
+  const runtime = extractRuntime(relOpEl);
   const node = {
     op: relOpEl.getAttribute('PhysicalOp') || 'Unknown',
     logicalOp: relOpEl.getAttribute('LogicalOp') || '',
     rows: parseFloat(relOpEl.getAttribute('EstimateRows')) || 0,
+    actualRows: runtime.actualRows,
+    actualExecutions: runtime.actualExecutions,
     cost: parseFloat(relOpEl.getAttribute('EstimatedTotalSubtreeCost')) || 0,
     rebinds: parseFloat(relOpEl.getAttribute('EstimateRebinds')) || 0,
     object: extractObject(relOpEl),
@@ -29,6 +32,16 @@ function buildTree(relOpEl) {
   return node;
 }
 
+function extractRuntime(relOpEl) {
+  const runtimeInfo = Array.from(relOpEl.children).find(child => child.tagName === 'RunTimeInformation');
+  const counters = runtimeInfo ? Array.from(runtimeInfo.querySelectorAll('RunTimeCountersPerThread')) : [];
+  if (!counters.length) return { actualRows: null, actualExecutions: null };
+  return counters.reduce((acc, el) => ({
+    actualRows: acc.actualRows + (parseFloat(el.getAttribute('ActualRows')) || 0),
+    actualExecutions: acc.actualExecutions + (parseFloat(el.getAttribute('ActualExecutions')) || 0),
+  }), { actualRows: 0, actualExecutions: 0 });
+}
+
 function extractObject(relOpEl) {
   const obj = relOpEl.querySelector('Object');
   if (!obj) return null;
@@ -36,6 +49,44 @@ function extractObject(relOpEl) {
   const index = (obj.getAttribute('Index') || '').replace(/^\[|\]$/g, '');
   const alias = (obj.getAttribute('Alias') || '').replace(/^\[|\]$/g, '');
   return [table, index || alias].filter(Boolean).join(' · ') || null;
+}
+
+function cleanBracketName(value) {
+  return (value || '').replace(/^\[|\]$/g, '');
+}
+
+function extractMissingIndexes(stmt) {
+  return Array.from(stmt.querySelectorAll('MissingIndexGroup')).flatMap(group => {
+    const impact = parseFloat(group.getAttribute('Impact')) || 0;
+    return Array.from(group.querySelectorAll('MissingIndex')).map((index, i) => {
+      const table = [index.getAttribute('Database'), index.getAttribute('Schema'), index.getAttribute('Table')]
+        .filter(Boolean)
+        .map(cleanBracketName)
+        .join('.');
+      const columns = { equality: [], inequality: [], include: [] };
+      Array.from(index.querySelectorAll('ColumnGroup')).forEach(colGroup => {
+        const usage = (colGroup.getAttribute('Usage') || '').toLowerCase();
+        const key = usage === 'inequality' ? 'inequality' : usage === 'include' ? 'include' : 'equality';
+        columns[key].push(...Array.from(colGroup.querySelectorAll('Column')).map(col => cleanBracketName(col.getAttribute('Name'))));
+      });
+      return {
+        id: `${table}-${impact}-${i}`,
+        impact,
+        table,
+        columns,
+        statement: buildMissingIndexStatement(table, columns),
+      };
+    });
+  });
+}
+
+function buildMissingIndexStatement(table, columns) {
+  const keyCols = [...columns.equality, ...columns.inequality];
+  if (!table || !keyCols.length) return '';
+  const safeName = table.replace(/[^a-zA-Z0-9_]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 96);
+  const include = columns.include.length ? `\nINCLUDE (${columns.include.map(c => `[${c}]`).join(', ')})` : '';
+  const qualifiedTable = table.split('.').map(part => `[${part.replace(/]/g, ']]')}]`).join('.');
+  return `CREATE INDEX [IX_${safeName}_recommended]\nON ${qualifiedTable} (${keyCols.map(c => `[${c.replace(/]/g, ']]')}]`).join(', ')})${include};`;
 }
 
 function parsePlanXml(xmlStr) {
@@ -51,6 +102,7 @@ function parsePlanXml(xmlStr) {
       return {
         text: (stmt.getAttribute('StatementText') || '').trim().slice(0, 120),
         cost: parseFloat(stmt.getAttribute('StatementSubTreeCost')) || tree.cost,
+        missingIndexes: extractMissingIndexes(stmt),
         tree,
       };
     }).filter(Boolean);
@@ -79,7 +131,7 @@ const OP_ICONS = {
   'SELECT': '▶', 'Update': '✏', 'Delete': '✕', 'Insert': '+',
 };
 
-function PlanNode({ node, totalCost, depth = 0 }) {
+function PlanNode({ node, totalCost, mode, depth = 0 }) {
   const [collapsed, setCollapsed] = useState(false);
   const pct = totalCost > 0 ? (node.cost / totalCost) * 100 : 0;
   const isExpensive = pct >= 30;
@@ -108,8 +160,14 @@ function PlanNode({ node, totalCost, depth = 0 }) {
         )}
         <div className="ep-meta-row">
           <span className="ep-rows">est. {formatRows(node.rows)} rows</span>
+          {mode === 'actual' && node.actualRows != null && (
+            <span className="ep-rows ep-actual-rows">actual {formatRows(node.actualRows)} rows</span>
+          )}
           {node.object && <span className="ep-object" title={node.object}>{node.object}</span>}
         </div>
+        {mode === 'actual' && node.actualExecutions != null && (
+          <div className="ep-runtime">executions: {formatRows(node.actualExecutions)}</div>
+        )}
 
         <div className="ep-cost-bar-track">
           <div
@@ -122,7 +180,7 @@ function PlanNode({ node, totalCost, depth = 0 }) {
       {hasChildren && !collapsed && (
         <div className="ep-children">
           {node.children.map((child, i) => (
-            <PlanNode key={i} node={child} totalCost={totalCost} depth={depth + 1} />
+            <PlanNode key={i} node={child} totalCost={totalCost} mode={mode} depth={depth + 1} />
           ))}
         </div>
       )}
@@ -132,7 +190,7 @@ function PlanNode({ node, totalCost, depth = 0 }) {
 
 // ── Main component ────────────────────────────────────────────────────────
 
-export default function ExecutionPlan({ plans }) {
+export default function ExecutionPlan({ plans, mode = 'estimated' }) {
   const parsed = useMemo(() => plans.flatMap(parsePlanXml), [plans]);
   const [activeStmt, setActiveStmt] = useState(0);
 
@@ -180,8 +238,26 @@ export default function ExecutionPlan({ plans }) {
         <span className="ep-legend-total">Total cost: {stmt.cost.toFixed(4)}</span>
       </div>
 
+      {stmt.missingIndexes.length > 0 && (
+        <div className="ep-missing-indexes">
+          <div className="ep-mi-title">Missing index recommendations</div>
+          {stmt.missingIndexes.map(item => (
+            <div key={item.id} className="ep-mi-item">
+              <div className="ep-mi-head">
+                <span className="ep-mi-impact">{item.impact.toFixed(1)}% impact</span>
+                <span className="ep-mi-table">{item.table}</span>
+              </div>
+              {item.columns.equality.length > 0 && <div className="ep-mi-cols">Equality: {item.columns.equality.join(', ')}</div>}
+              {item.columns.inequality.length > 0 && <div className="ep-mi-cols">Inequality: {item.columns.inequality.join(', ')}</div>}
+              {item.columns.include.length > 0 && <div className="ep-mi-cols">Include: {item.columns.include.join(', ')}</div>}
+              {item.statement && <pre className="ep-mi-sql">{item.statement}</pre>}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="ep-tree-scroll">
-        <PlanNode node={stmt.tree} totalCost={stmt.cost} depth={0} />
+        <PlanNode node={stmt.tree} totalCost={stmt.cost} mode={mode} depth={0} />
       </div>
     </div>
   );

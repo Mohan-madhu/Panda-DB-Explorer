@@ -95,30 +95,38 @@ router.post('/execute-multi', async (req, res) => {
   res.json(results);
 });
 
-// POST /api/query/plan — returns estimated XML execution plan (no actual execution)
-router.post('/plan', async (req, res) => {
-  const { connectionId, sql: sqlText, database } = req.body;
-  if (!connectionId || !sqlText) return res.status(400).json({ error: 'connectionId and sql required' });
-  try {
-    const pool = db.getPool(connectionId);
-    const request = pool.request();
-    const fullSql = database ? `USE [${database}];\nSET SHOWPLAN_XML ON;\n${sqlText}` : `SET SHOWPLAN_XML ON;\n${sqlText}`;
-    const result = await request.query(fullSql);
-
-    // SHOWPLAN_XML returns one row per statement; each row has one column with the XML plan
-    const plans = [];
-    const recordsets = result.recordsets || (result.recordset ? [result.recordset] : []);
-    for (const rs of recordsets) {
-      if (rs && rs.length > 0) {
-        const firstRow = rs[0];
-        const xml = Object.values(firstRow)[0];
-        if (xml && typeof xml === 'string' && xml.trim().startsWith('<')) {
-          plans.push(xml);
+function extractXmlPlans(result) {
+  const plans = [];
+  const recordsets = result.recordsets || (result.recordset ? [result.recordset] : []);
+  for (const rs of recordsets) {
+    if (!rs || rs.length === 0) continue;
+    for (const row of rs) {
+      for (const value of Object.values(row)) {
+        if (typeof value === 'string') {
+          const xml = value.trim();
+          if (xml.startsWith('<ShowPlanXML') || xml.includes('<ShowPlanXML')) plans.push(value);
         }
       }
     }
+  }
+  return plans;
+}
 
-    res.json({ plans, success: true });
+// POST /api/query/plan — returns estimated or actual XML execution plans
+router.post('/plan', async (req, res) => {
+  const { connectionId, sql: sqlText, database, mode = 'estimated' } = req.body;
+  if (!connectionId || !sqlText) return res.status(400).json({ error: 'connectionId and sql required' });
+  if (!['estimated', 'actual'].includes(mode)) return res.status(400).json({ error: 'mode must be estimated or actual' });
+
+  try {
+    const pool = db.getPool(connectionId);
+    const request = pool.request();
+    const prefix = database ? `USE [${database}];\n` : '';
+    const fullSql = mode === 'actual'
+      ? `${prefix}SET STATISTICS XML ON;\n${sqlText};\nSET STATISTICS XML OFF;`
+      : `${prefix}SET SHOWPLAN_XML ON;\n${sqlText};\nSET SHOWPLAN_XML OFF;`;
+    const result = await request.query(fullSql);
+    res.json({ plans: extractXmlPlans(result), mode, success: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

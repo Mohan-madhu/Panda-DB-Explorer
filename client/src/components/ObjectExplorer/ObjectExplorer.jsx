@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RefreshCw, Plus, Search } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { getDatabases, getDbTree, getColumns, getDefinition, getSpParams } from '../../api/explorer';
+import { getDatabases, getDbTree, getColumns, getDefinition, getSpParams, getObjectScript } from '../../api/explorer';
 import { updateDbSchema, updateColumnSchema } from '../../intellisense/schemaRegistry';
 import { formatType } from '../../intellisense/completionProvider';
 import ParamsModal from '../ParamsModal/ParamsModal';
@@ -79,6 +79,14 @@ export default function ObjectExplorer() {
     } catch (err) { alert(`Could not get definition: ${err.message}`); }
   };
 
+  const openObjectScript = async (connId, db, schema, name, fallbackType) => {
+    try {
+      const { script, objectType } = await getObjectScript(connId, db, schema, name);
+      const type = objectType || fallbackType || 'OBJECT';
+      addTab({ name: `CREATE ${name}`, content: script, connectionId: connId, connectionIds: [connId], database: db, objectType: type });
+    } catch (err) { alert(`Could not script object: ${err.message}`); }
+  };
+
   const handleSpExecWithParams = async (connId, db, schema, name) => {
     try {
       const params = await getSpParams(connId, db, schema, name);
@@ -127,6 +135,10 @@ export default function ObjectExplorer() {
         },
         { separator: true },
         {
+          label: 'Script CREATE TABLE', icon: '📜',
+          action: () => openObjectScript(connId, db, schema, table, 'TABLE'),
+        },
+        {
           label: 'Script SELECT', icon: '📋',
           action: () => addTab({ name: `SEL ${table}`, content: `SELECT *\nFROM [${db}].[${schema}].[${table}]\nWHERE 1=1`, connectionId: connId, connectionIds: [connId], database: db }),
         },
@@ -157,6 +169,7 @@ export default function ObjectExplorer() {
     setContextMenu({
       x: e.clientX, y: e.clientY,
       items: [
+        { label: 'Script CREATE VIEW', icon: '📜', action: () => openObjectScript(connId, db, schema, name, 'VIEW') },
         { label: 'View Definition', icon: '📜', action: () => openDefinition(connId, db, schema, name, 'VIEW') },
         { label: 'Select Top 1000', icon: '▶', action: () => addTab({ name: `VIEW ${name}`, content: `SELECT TOP 1000 *\nFROM [${db}].[${schema}].[${name}]`, connectionId: connId, connectionIds: [connId], database: db }) },
       ],
@@ -166,7 +179,9 @@ export default function ObjectExplorer() {
   const onProcContext = (e, connId, db, schema, name, type) => {
     e.preventDefault(); e.stopPropagation();
     const label = type === 'PROCEDURE' ? 'SP' : 'FN';
+    const scriptLabel = type === 'PROCEDURE' ? 'Script CREATE PROCEDURE' : 'Script CREATE FUNCTION';
     const items = [
+      { label: scriptLabel, icon: '📜', action: () => openObjectScript(connId, db, schema, name, type) },
       { label: 'View Definition', icon: '📜', action: () => openDefinition(connId, db, schema, name, label) },
       {
         label: type === 'PROCEDURE' ? 'Script EXEC' : 'Script SELECT',
