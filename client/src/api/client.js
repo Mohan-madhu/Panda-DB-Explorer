@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const runtimeApiBaseUrl = window.PANDA_DB_CONFIG?.apiBaseUrl;
+const API_BASE_URL = runtimeApiBaseUrl || import.meta.env.VITE_API_BASE_URL || '/api';
 
 const client = axios.create({
   baseURL: API_BASE_URL,

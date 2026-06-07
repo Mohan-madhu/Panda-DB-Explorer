@@ -509,6 +509,14 @@ The client reads this build-time environment variable:
 VITE_API_BASE_URL=/api
 ```
 
+For static hosting, the built `dist/runtime-config.js` file can override the API URL without rebuilding:
+
+```js
+window.PANDA_DB_CONFIG = {
+  apiBaseUrl: 'https://pandadbapi.sheetspanda.in/api',
+};
+```
+
 Use one of these deployment patterns:
 
 1. Same-origin reverse proxy:
@@ -518,7 +526,7 @@ Use one of these deployment patterns:
 
 2. Separate API subdomain:
    - Host the backend at `https://pandadbapi.sheetspanda.in`.
-   - Build the client with:
+   - Build the client with this value, or edit `dist/runtime-config.js` after upload:
 
 ```bash
 VITE_API_BASE_URL=https://pandadbapi.sheetspanda.in/api
@@ -529,6 +537,11 @@ If your reverse proxy maps the backend root directly to Express routes without a
 ```bash
 VITE_API_BASE_URL=https://pandadbapi.sheetspanda.in
 ```
+
+For your current setup, where `https://pandadb.sheetspanda.in` serves only static frontend files from Hestia, either:
+
+1. Configure a reverse proxy so `https://pandadb.sheetspanda.in/api/*` forwards to the backend, or
+2. Set `dist/runtime-config.js` to the real backend URL, for example `https://pandadbapi.sheetspanda.in/api`.
 
 The Vite dev server still proxies local `/api` requests to `http://localhost:3001` when `VITE_API_BASE_URL` is left as `/api` (see `client/vite.config.js`).
 
