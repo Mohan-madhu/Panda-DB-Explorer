@@ -14,14 +14,19 @@ import './QueryEditor.css';
 
 const SYSTEM_DBS = new Set(['master', 'tempdb', 'model', 'msdb']);
 
+const DDL_RE = /^\s*(CREATE|ALTER|DROP)\s+(PROCEDURE|PROC|FUNCTION|VIEW|TRIGGER)\b/im;
+
 function detectUndeclaredParams(sql) {
+  if (DDL_RE.test(sql)) return [];
+  // Strip named EXEC arguments (@param = value) — these are SP parameter names, not local variables
+  const stripped = sql.replace(/@\w+\s*=\s*(?:N?'[^']*'|-?\d+(?:\.\d+)?|NULL\b)/gi, '');
   const declared = new Set();
   const used = new Set();
   const declareRe = /DECLARE\s+(@\w+)/gi;
   const useRe = /(?<![@@])@(\w+)/g;
   let m;
-  while ((m = declareRe.exec(sql))) declared.add(m[1].toLowerCase());
-  while ((m = useRe.exec(sql))) {
+  while ((m = declareRe.exec(stripped))) declared.add(m[1].toLowerCase());
+  while ((m = useRe.exec(stripped))) {
     const full = '@' + m[1];
     if (!full.startsWith('@@')) used.add(full.toLowerCase());
   }

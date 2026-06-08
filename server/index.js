@@ -25,4 +25,16 @@ app.use('/api/import', require('./routes/import'));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`MSSQL-Web server running on http://localhost:${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`MSSQL-Web server running on http://localhost:${PORT}`);
+  const db = require('./services/db');
+  const profiles = db.loadProfiles();
+  if (profiles.length) {
+    console.log(`Auto-reconnecting ${profiles.length} saved connection(s)...`);
+    await Promise.allSettled(profiles.map(p =>
+      db.connect(p.id, p)
+        .then(() => console.log(`  ✓ ${p.name || p.server}`))
+        .catch(err => console.warn(`  ✗ ${p.name || p.server}: ${err.message}`))
+    ));
+  }
+});

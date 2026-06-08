@@ -3,6 +3,13 @@ const router = express.Router();
 const db = require('../services/db');
 const cache = require('../services/cache');
 
+const DDL_RE = /^\s*(CREATE|ALTER|DROP)\s+(PROCEDURE|PROC|FUNCTION|VIEW|TRIGGER)\b/im;
+
+function buildFullSql(database, sqlText) {
+  if (!database || DDL_RE.test(sqlText)) return sqlText;
+  return `USE [${database}];\n${sqlText}`;
+}
+
 // POST /api/query/execute
 router.post('/execute', async (req, res) => {
   const { connectionId, sql: sqlText, database } = req.body;
@@ -24,7 +31,7 @@ router.post('/execute', async (req, res) => {
       });
     });
 
-    const fullSql = database ? `USE [${database}];\n${sqlText}` : sqlText;
+    const fullSql = buildFullSql(database, sqlText);
     const result = await request.query(fullSql);
     const elapsed = Date.now() - startTime;
 
@@ -63,7 +70,7 @@ router.post('/execute-multi', async (req, res) => {
     const startTime = Date.now();
     try {
       const pool = db.getPool(connId);
-      const fullSql = database ? `USE [${database}];\n${sqlText}` : sqlText;
+      const fullSql = buildFullSql(database, sqlText);
       const req2 = pool.request();
       const msgs = [];
       req2.on('info', (info) => {
@@ -121,7 +128,7 @@ router.post('/plan', async (req, res) => {
   try {
     const pool = db.getPool(connectionId);
     const request = pool.request();
-    const prefix = database ? `USE [${database}];\n` : '';
+    const prefix = (database && !DDL_RE.test(sqlText)) ? `USE [${database}];\n` : '';
     const fullSql = mode === 'actual'
       ? `${prefix}SET STATISTICS XML ON;\n${sqlText};\nSET STATISTICS XML OFF;`
       : `${prefix}SET SHOWPLAN_XML ON;\n${sqlText};\nSET SHOWPLAN_XML OFF;`;

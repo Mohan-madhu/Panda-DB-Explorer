@@ -332,8 +332,9 @@ router.get('/:connId/databases/:db/script/:schema/:name', async (req, res) => {
 
     if (!meta.recordset.length) return res.status(404).json({ error: 'Object not found.' });
     const object = meta.recordset[0];
+    const typeCode = (object.type || '').trim();
 
-    if (object.type === 'U') {
+    if (typeCode === 'U') {
       const scriptResult = await pool.request().query(`
         USE ${quoteName(database)};
         DECLARE @object_id INT = OBJECT_ID(${objectLiteral}, N'U');
@@ -449,7 +450,7 @@ router.get('/:connId/databases/:db/script/:schema/:name', async (req, res) => {
       FS: 'FUNCTION',
       FT: 'FUNCTION',
     };
-    const objectType = moduleTypes[object.type];
+    const objectType = moduleTypes[typeCode];
     if (!objectType || !object.definition) {
       return res.status(404).json({ error: 'Script not available. Object may be encrypted or unsupported.' });
     }
